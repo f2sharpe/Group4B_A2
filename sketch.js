@@ -14,7 +14,7 @@ function setup() {
   tasks.push(new Task(650, 150, "Color Match"));
   tasks.push(new Task(400, 450, "Find Bottle"));
 
-  //loadProgress();
+  loadProgress();
 }
 
 function draw() {
@@ -110,7 +110,7 @@ class Task {
         this.completed = true;
         this.inProgress = false;
         progress += 10;
-        //saveProgress();
+        saveProgress();
       }, 2000); // simulate doing task
     }
   }
@@ -162,14 +162,14 @@ function handleInterruptions() {
   }
 }
 
-//function saveProgress() {
-//localStorage.setItem("adhdProgress", progress);
-//}
+function saveProgress() {
+  localStorage.setItem("adhdProgress", progress);
+}
 
-//function loadProgress() {
-//let saved = localStorage.getItem("adhdProgress");
-//if (saved) progress = int(saved);
-//}
+function loadProgress() {
+  let saved = localStorage.getItem("adhdProgress");
+  if (saved) progress = int(saved);
+}
 
 function keyPressed() {
   if (key === " ") gameStarted = true;
