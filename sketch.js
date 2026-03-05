@@ -1,3 +1,4 @@
+let gameStarted = false;
 let player;
 let tasks = [];
 let currentTask = null;
@@ -17,7 +18,22 @@ function setup() {
 }
 
 function draw() {
-  background(220, 240, 255); // daycare vibe
+  if (!gameStarted) {
+    background(200);
+    textAlign(CENTER);
+    textSize(28);
+    text("ADHD Task Game", width / 2, 200);
+
+    textSize(18);
+    text("Move with WASD or Arrow Keys", width / 2, 260);
+    text("Click tasks to complete them", width / 2, 290);
+    text("Interruptions will distract you!", width / 2, 320);
+
+    text("Press SPACE to start", width / 2, 380);
+    return;
+  }
+
+  background(220, 240, 255);
 
   drawRoom();
   player.update();
@@ -50,6 +66,8 @@ class Player {
     if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) this.y += this.speed;
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) this.x -= this.speed;
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) this.x += this.speed;
+    this.x = constrain(this.x, 70, width - 70);
+    this.y = constrain(this.y, 70, height - 120);
   }
 
   display() {
@@ -70,8 +88,11 @@ class Task {
   display() {
     if (this.completed) return;
 
-    if (this.inProgress) fill(255, 255, 0);
-    else fill(0, 255, 0);
+    if (this.inProgress) {
+      fill(255, 255, 0); // yellow
+    } else {
+      fill(0, 255, 0); // green
+    }
 
     rect(this.x - 40, this.y - 40, 80, 80);
 
@@ -123,6 +144,13 @@ function handleInterruptions() {
   if (frameCount % 600 === 0 && progress < 30) {
     interruption = random(["Crying!", "Poopoo!", "Meal Time!"]);
     interruptionTimer = 180;
+
+    // cancel any task
+    tasks.forEach((task) => {
+      if (task.inProgress) {
+        task.inProgress = false;
+      }
+    });
   }
 
   if (interruptionTimer > 0) {
@@ -141,4 +169,8 @@ function saveProgress() {
 function loadProgress() {
   let saved = localStorage.getItem("adhdProgress");
   if (saved) progress = int(saved);
+}
+
+function keyPressed() {
+  if (key === " ") gameStarted = true;
 }
