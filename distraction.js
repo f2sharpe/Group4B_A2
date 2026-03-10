@@ -39,6 +39,8 @@ class Distraction {
 
     if (dist(player.x, player.y, this.x, this.y) < 50) {
       focus -= 0.15;
+
+      shake = 8;
     }
   }
 }
