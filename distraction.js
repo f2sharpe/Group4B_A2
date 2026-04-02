@@ -18,6 +18,12 @@ class Distraction {
     let dx = player.x - this.x;
     let dy = player.y - this.y;
 
+    // reverse direction if in safe zone
+    if (playerInSafeZone) {
+      dx *= -1;
+      dy *= -1;
+    }
+
     this.x += dx * speed;
     this.y += dy * speed;
   }

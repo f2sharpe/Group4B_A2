@@ -16,16 +16,193 @@ let progress = 0;
 let particles = [];
 let focusOrbs = [];
 let shake = 0;
+let safeZones = [];
+let lastSafeSpawn = 0;
+let playerInSafeZone = false;
+let wordLists = {
+  1: [
+    // EASY (3–5 letters)
+    "cat",
+    "dog",
+    "pen",
+    "book",
+    "desk",
+    "lamp",
+    "chair",
+    "phone",
+    "water",
+    "clock",
+    "mouse",
+    "paper",
+    "light",
+    "plant",
+    "table",
+    "bag",
+    "cup",
+    "door",
+    "floor",
+    "wall",
+    "glass",
+    "shirt",
+    "shoes",
+    "bread",
+    "toast",
+    "juice",
+    "apple",
+    "grape",
+    "peach",
+    "snack",
+    "notes",
+    "study",
+    "learn",
+    "write",
+    "draw",
+    "think",
+    "focus",
+    "start",
+    "begin",
+    "again",
+  ],
+
+  2: [
+    // MEDIUM (5–8 letters)
+    "focus",
+    "brain",
+    "energy",
+    "memory",
+    "effort",
+    "mental",
+    "typing",
+    "reading",
+    "writing",
+    "working",
+    "balance",
+    "control",
+    "routine",
+    "process",
+    "problem",
+    "project",
+    "deadline",
+    "meeting",
+    "message",
+    "reminder",
+    "organize",
+    "prepare",
+    "improve",
+    "develop",
+    "practice",
+    "analyze",
+    "reflect",
+    "connect",
+    "support",
+    "progress",
+    "schedule",
+    "priority",
+    "attention",
+    "disrupt",
+    "mistake",
+    "restart",
+    "attempt",
+    "complete",
+    "continue",
+    "struggle",
+  ],
+
+  3: [
+    // HARD (8–14 letters)
+    "attention",
+    "distraction",
+    "overwhelm",
+    "concentration",
+    "productivity",
+    "organization",
+    "responsibility",
+    "procrastination",
+    "interruption",
+    "multitasking",
+    "forgetfulness",
+    "restlessness",
+    "hyperactivity",
+    "inconsistency",
+    "frustration",
+    "motivation",
+    "stimulation",
+    "prioritization",
+    "decisionmaking",
+    "selfregulation",
+    "cognitive",
+    "processing",
+    "performance",
+    "persistence",
+    "management",
+    "adaptation",
+    "expectation",
+    "limitation",
+    "accountability",
+    "environment",
+    "commitment",
+    "evaluation",
+    "implementation",
+    "optimization",
+    "coordination",
+    "complexity",
+  ],
+};
+let currentWord = "";
+let typedText = "";
 
 function setup() {
-  createCanvas(1000, 650);
-
+  createCanvas(windowWidth, windowHeight);
   player = new Player();
-
   initLevel();
+  initStars();
 }
 
+function drawMenuText() {
+  textAlign(CENTER, CENTER);
+
+  // glowing title
+  for (let i = 0; i < 5; i++) {
+    fill(0, 255, 200, 30);
+    textSize(70);
+    text("FOCUS FRENZY", width / 2, 180);
+  }
+
+  // instructions
+  textSize(22);
+  fill(220);
+
+  let y = height / 2 - 60;
+  let lineSpacing = 35;
+
+  let instructions = [
+    "Move with WASD",
+    "Hover over tasks to start them",
+    "Type the correct word to finish",
+    "Distractions will chase you",
+    "They move faster when you focus on tasks",
+    "",
+    "Complete all tasks before your focus runs out",
+  ];
+
+  for (let i = 0; i < instructions.length; i++) {
+    text(instructions[i], width / 2, y + i * lineSpacing);
+  }
+
+  // glowing SPACE text
+  let pulse = sin(frameCount * 0.05) * 50 + 150;
+
+  fill(0, 255, 200, pulse);
+  textSize(26);
+  text("Press SPACE to start", width / 2, height - 120);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
 function draw() {
+  let sx = width / 1000;
+  let sy = height / 650;
   if (state === "menu") drawMenu();
   if (state === "game") runGame();
   if (state === "win") drawWin();
@@ -35,33 +212,66 @@ function draw() {
 function runGame() {
   push();
 
+  // screen shake
   translate(random(-shake, shake), random(-shake, shake));
+
   drawLevelMap();
 
+  // player
   player.update();
   player.draw();
 
+  // tasks
   for (let t of tasks) {
     t.draw();
     t.checkHover();
   }
 
+  // distractions spawn
   spawnDistractions();
 
+  // ✅ SAFE ZONE SPAWN (level 2+)
+  //if (level >= 2 && millis() - lastSafeSpawn > 15000) {
+  //safeZones.push(
+  // new SafeZone(random(100, width - 200), random(100, height - 200), 120),
+  // );
+
+  //lastSafeSpawn = millis();
+  //}
+
+  // ✅ SAFE ZONE UPDATE + DETECTION
+  //playerInSafeZone = false;
+
+  //for (let z of safeZones) {
+  //z.update();
+  // z.draw();
+
+  //if (z.isInside(player.x, player.y)) {
+  //  playerInSafeZone = true;
+  //}
+  //}
+
+  // remove expired zones
+  //safeZones = safeZones.filter((z) => !z.isExpired());
+
+  // distractions
   for (let d of distractions) {
     d.update();
     d.draw();
   }
 
+  // UI
   drawTaskPanel();
   drawUI();
 
+  // timer + lose condition
   timer -= deltaTime / 1000;
 
   if (timer <= 0 || focus <= 0) {
     state = "lose";
   }
 
+  // win / next level
   if (tasks.every((t) => t.done)) {
     level++;
 
@@ -72,6 +282,7 @@ function runGame() {
     }
   }
 
+  // particles
   for (let p of particles) {
     p.update();
     p.draw();
@@ -79,6 +290,7 @@ function runGame() {
 
   particles = particles.filter((p) => p.life > 0);
 
+  // focus orbs
   if (frameCount % 900 === 0) {
     focusOrbs.push(
       new FocusOrb(random(100, width - 100), random(100, height - 100)),
@@ -94,6 +306,7 @@ function runGame() {
 
   pop();
 
+  // decay screen shake
   shake *= 0.9;
 }
 
@@ -137,22 +350,31 @@ function mousePressed() {
 }
 
 function keyPressed() {
+  // typing system
   if (activeTask) {
-    if (key.toUpperCase() === sequence[progress]) {
-      progress++;
+    if (key.length === 1) {
+      typedText += key.toLowerCase();
+    }
 
-      if (progress >= sequence.length) {
-        activeTask.done = true;
-        spawnParticles(activeTask.x + 20, activeTask.y + 20);
-        activeTask = null;
-        player.locked = false;
-      }
-    } else {
-      progress = 0;
+    // reset if wrong
+    if (!currentWord.startsWith(typedText)) {
+      typedText = "";
+    }
+
+    // completed word
+    if (typedText === currentWord) {
+      activeTask.done = true;
+      spawnParticles(activeTask.x + 20, activeTask.y + 20);
+
+      activeTask = null;
+      player.locked = false;
+
+      typedText = "";
     }
   }
 
-  if (key === " " && state === "menu") {
+  // start game
+  if (keyCode === 32 && state === "menu") {
     state = "game";
   }
 }

@@ -21,8 +21,12 @@ class Task {
 
   checkHover() {
     if (this.done) return;
+    if (activeTask) return;
 
-    if (dist(player.x, player.y, this.x, this.y) < 40) {
+    let centerX = this.x + 20;
+    let centerY = this.y + 20;
+
+    if (dist(player.x, player.y, centerX, centerY) < 40) {
       startTask(this);
     }
   }
@@ -34,8 +38,8 @@ function startTask(task) {
   activeTask = task;
   player.locked = true;
 
-  sequence = randomSequence();
-  progress = 0;
+  currentWord = random(wordLists[level]);
+  typedText = "";
 }
 
 function randomSequence() {

@@ -3,18 +3,33 @@ class FocusOrb {
     this.x = x;
     this.y = y;
 
+    // ✅ ADD THESE TWO LINES
+    this.spawnX = x;
+    this.spawnY = y;
+
     this.anim = random(100);
   }
 
   update() {
-    this.anim += 0.1;
+    this.anim += 0.05;
 
-    // move away from player
-    let dx = this.x - player.x;
-    let dy = this.y - player.y;
+    // gentle floating motion
+    this.x += sin(this.anim) * 0.5;
+    this.y += cos(this.anim * 1.2) * 0.5;
 
-    this.x += dx * 0.01;
-    this.y += dy * 0.01;
+    // keep near spawn point
+    let dx = this.x - this.spawnX;
+    let dy = this.y - this.spawnY;
+
+    let distFromHome = sqrt(dx * dx + dy * dy);
+
+    let maxRadius = 40;
+
+    if (distFromHome > maxRadius) {
+      // pull back toward spawn
+      this.x -= dx * 0.02;
+      this.y -= dy * 0.02;
+    }
   }
 
   draw() {

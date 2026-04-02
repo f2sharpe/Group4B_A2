@@ -1,3 +1,38 @@
+let stars = [];
+
+function initStars() {
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: random(width),
+      y: random(height),
+      size: random(1, 3),
+      alpha: random(50, 150),
+    });
+  }
+}
+
+function drawStars() {
+  noStroke();
+  for (let s of stars) {
+    fill(0, 255, 200, s.alpha);
+    circle(s.x, s.y, s.size);
+
+    // subtle flicker
+    s.alpha += random(-2, 2);
+    s.alpha = constrain(s.alpha, 30, 180);
+  }
+}
+
+function drawBorder() {
+  noFill();
+
+  for (let i = 0; i < 3; i++) {
+    stroke(0, 255, 200, 80 - i * 20);
+    strokeWeight(2 + i);
+    rect(40, 40, width - 80, height - 80);
+  }
+}
+
 function drawUI() {
   fill(255);
 
@@ -25,49 +60,51 @@ function drawUI() {
 function drawTaskPanel() {
   if (!activeTask) return;
 
+  let padding = 40;
+  let wordWidth = currentWord.length * 20;
+  let boxWidth = max(220, wordWidth + padding);
+
+  let boxX = width / 2 - boxWidth / 2;
+  let boxY = height / 2 - 100;
+  let centerX = width / 2;
+
   fill(40);
-  rect(width - 260, 120, 220, 200, 10);
+  rect(boxX, boxY, boxWidth, 200, 10);
 
-  fill(255);
+  textAlign(CENTER, CENTER);
 
-  textSize(18);
-  textAlign(CENTER);
-
-  text("COMPLETE TASK", width - 150, 160);
-
-  let seqText = "";
-
-  for (let i = 0; i < sequence.length; i++) {
-    if (i < progress) seqText += "✓ ";
-    else seqText += sequence[i] + " ";
+  // build display text FIRST
+  let displayText = "";
+  for (let i = 0; i < currentWord.length; i++) {
+    if (i < typedText.length) {
+      displayText += currentWord[i] + " ";
+    } else {
+      displayText += "_ ";
+    }
   }
 
-  textSize(24);
-  text(seqText, width - 150, 230);
+  // title
+  fill(255);
+  textSize(18);
+  text("TYPE THE WORD", centerX, boxY + 40);
+
+  // faint word
+  fill(120);
+  textSize(20);
+  text(currentWord, centerX, boxY + 80);
+
+  // progress
+  fill(255);
+  textSize(28);
+  text(displayText, centerX, boxY + 120);
 }
 
 function drawMenu() {
-  background(0);
+  background(5);
 
-  fill(255);
-
-  textAlign(CENTER);
-
-  textSize(52);
-  text("FOCUS FRENZY", width / 2, 180);
-
-  textSize(20);
-
-  text("Move with WASD", width / 2, 250);
-  text("Hover over tasks to start them", width / 2, 280);
-  text("Press the correct key sequence to finish", width / 2, 310);
-
-  text("Distractions will chase you.", width / 2, 360);
-  text("They move faster when you focus on tasks.", width / 2, 390);
-
-  text("Complete all tasks before your focus runs out.", width / 2, 440);
-
-  text("Press SPACE to start", width / 2, 500);
+  drawStars(); // background particles
+  drawBorder(); // glowing frame
+  drawMenuText(); // all text
 }
 
 function drawWin() {
@@ -119,6 +156,4 @@ function drawLevelMap() {
   noFill();
 
   rect(40, 60, width - 80, height - 120);
-
-  line(width / 2, 60, width / 2, height - 60);
 }
