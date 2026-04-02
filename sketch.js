@@ -177,10 +177,10 @@ function drawMenuText() {
 
   let instructions = [
     "Move with WASD",
-    "Hover over tasks to start them",
+    "Hover character over tasks to start them",
     "Type the correct word to finish",
     "Distractions will chase you",
-    "They move faster when you focus on tasks",
+    "Safe spaces will spawn to protect you from enemies",
     "",
     "Complete all tasks before your focus runs out",
   ];
