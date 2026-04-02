@@ -53,7 +53,9 @@ function drawUI() {
   fill(100);
   rect(600, 20, 200, 16);
 
-  fill(0, 255, 150);
+  let state = getFocusState();
+
+  fill(state.color);
   rect(600, 20, focus * 2, 16);
 }
 

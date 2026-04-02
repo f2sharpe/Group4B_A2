@@ -26,24 +26,32 @@ class Player {
 
     translate(this.x, this.y + bounce);
 
-    stroke(255);
+    let state = getFocusState();
+
+    // face outline
+    stroke(state.color);
     strokeWeight(3);
     fill(0);
-
     ellipse(0, 0, 40);
 
-    fill(255);
+    // eyes
+    fill(state.color);
     noStroke();
-
     ellipse(-7, -5, 6);
     ellipse(7, -5, 6);
 
-    stroke(255);
+    // mouth
+    stroke(state.color);
     strokeWeight(3);
     noFill();
 
-    arc(0, 5, 20, 15, 0, PI);
-
+    if (state.mood === "happy") {
+      arc(0, 5, 20, 15, 0, PI);
+    } else if (state.mood === "ok") {
+      line(-8, 8, 8, 8);
+    } else {
+      arc(0, 12, 20, 15, PI, TWO_PI);
+    }
     pop();
   }
 }

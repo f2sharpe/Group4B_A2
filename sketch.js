@@ -309,6 +309,24 @@ function runGame() {
   // decay screen shake
   shake *= 0.9;
 }
+function getFocusState() {
+  if (focus > 66) {
+    return {
+      color: color(0, 255, 150), // green
+      mood: "happy",
+    };
+  } else if (focus > 33) {
+    return {
+      color: color(255, 200, 0), // yellow
+      mood: "ok",
+    };
+  } else {
+    return {
+      color: color(255, 80, 80), // red
+      mood: "sad",
+    };
+  }
+}
 
 function initLevel() {
   tasks = [];
