@@ -23,6 +23,7 @@ let wordLists = {
   1: [
     // EASY (3–5 letters)
     "cat",
+    "joe",
     "dog",
     "pen",
     "book",
@@ -62,6 +63,9 @@ let wordLists = {
     "start",
     "begin",
     "again",
+    "sofia",
+    "karen",
+    "david",
   ],
 
   2: [
@@ -73,6 +77,7 @@ let wordLists = {
     "effort",
     "mental",
     "typing",
+    "allison",
     "reading",
     "writing",
     "working",
@@ -106,6 +111,7 @@ let wordLists = {
     "complete",
     "continue",
     "struggle",
+    "fintan",
   ],
 
   3: [
@@ -113,6 +119,7 @@ let wordLists = {
     "attention",
     "distraction",
     "overwhelm",
+    "mercedes",
     "concentration",
     "productivity",
     "organization",
